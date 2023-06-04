@@ -1,6 +1,6 @@
 import {
   Billboard,
-  Bvh,
+  Sky,
   Center,
   MeshTransmissionMaterial,
   Text,
@@ -16,19 +16,21 @@ import { useThree, useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 
 function Scene() {
+  useFrame((state) => {
+    state.camera.position.lerp(
+      { x: state.pointer.x / 2, y: -state.pointer.y / 2, z: 1.6 },
+      0.1
+    );
+    state.camera.lookAt(-0.7, -0.4, 0);
+  });
+
   return (
     <>
       <Center>
-        <Model
-          scale={3}
-          position={[-3.09, -3.93, -3.71]}
-          rotation={[0, -2.51, 0]}
-          name="car"
-        />
+        <Model scale={1} name="room" />
         <Effect />
-        <Environment resolution={512} files={"/studio_small_03_1k.hdr"} />
-        <SkyBox />
       </Center>
+      <Environment resolution={512} files={"/empty_warehouse_01_1k.hdr"} />
     </>
   );
 }

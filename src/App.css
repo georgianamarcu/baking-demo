@@ -13,5 +13,29 @@ body,
 }
 
 body {
-  background: #f0f0f0;
+  background: #ffffff75;
+  /* fallback for old browsers */
+
+}
+
+.container {
+  width: 200px;
+  height: 400px;
+  position: fixed;
+  bottom: 15vh;
+  left: 60vh;
+}
+
+h1 {
+  color: rgb(104, 114, 95);
+  font-family: 'Italiana', serif;
+  font-size: 100px;
+  font-weight: 900;
+  height: auto;
+  width: 50vw;
+  opacity: 0.4;
+}
+
+.span {
+  margin-left: 80px;
 }

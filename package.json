@@ -12,10 +12,11 @@
   "dependencies": {
     "@react-three/drei": "^9.68.6",
     "@react-three/fiber": "^8.13.0",
-    "@react-three/postprocessing": "^2.11.4",
+    "@react-three/postprocessing": "^2.13.0",
     "@types/three": "^0.152.0",
     "leva": "^0.9.34",
     "maath": "^0.5.3",
+    "postprocessing": "^6.31.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "three": "^0.152.2"
