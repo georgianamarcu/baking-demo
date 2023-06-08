@@ -39,3 +39,17 @@ h1 {
 .span {
   margin-left: 80px;
 }
+
+.lamp-icon {
+  height: 50px;
+  width: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  border-radius: 50%;
+  background: #e1e0e0;
+  box-shadow: 4px 4px 9px #bfbebe53,
+    -4px -4px 9px #ffffff5f;
+
+}

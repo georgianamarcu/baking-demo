@@ -10,17 +10,24 @@ function App() {
   return (
     <>
       <Canvas
-        dpr={1.5}
+        dpr={[1, 2]}
         shadows
+        gl={{ antialias: false }}
         camera={{
-          fov: 45,
+          fov: 40,
+          near: 0.1,
+          position: [
+            -1.8164859794614057, 0.0038961914109026364, 1.4374743840103745,
+          ],
+          rotation: [
+            -0.002710435683351626, -0.9013508954177016, -0.0021254333081949864,
+          ],
         }}
-        // gl={{ alpha: false, stencil: false, antialias: false, depth: false }}
       >
-        <Scene />
+        <Scene position={[0.17, 0.42, 0.92]} />
       </Canvas>
       <Loader />
-      <Overlay />
+      {/* <Overlay /> */}
     </>
   );
 }

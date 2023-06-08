@@ -1,9 +1,23 @@
 import LensFlare from "./UltimateLensFlare";
-import { EffectComposer, SMAA, Bloom, N8AO } from "@react-three/postprocessing";
+import {
+  EffectComposer,
+  Bloom,
+  TiltShift2,
+  SMAA,
+} from "@react-three/postprocessing";
 import { useControls, folder } from "leva";
+import { N8AOPostPass } from "n8ao";
 import { Color } from "three";
 
 function Effect() {
+  // const config = useControls({
+  //   intensity: { value: 3, min: 0, max: 20 },
+  //   aoRadius: { value: 1.0, min: 0, max: 10 },
+  //   aoSamples: { value: 6, min: 1, max: 64, step: 1 },
+  //   denoiseSamples: { value: 4, min: 1, max: 12, step: 1 },
+  //   denoiseRadius: { value: 12, min: 1, max: 12, step: 1 },
+  //   distanceFalloff: { value: 1.0, min: 0, max: 10 },
+  // });
   // const config = useControls({
   //   intensity: { value: 5, min: 0, max: 20 },
   //   color: "#343e93",
@@ -113,11 +127,10 @@ function Effect() {
   //   ),
   // });
   return (
-    <EffectComposer disableNormalPass multisampling={1}>
-      <LensFlare
+    <EffectComposer disableNormalPass>
+      {/* <LensFlare
         // {...lensFlareProps}
         opacity={0.3}
-        // animated={false}
         position={[4, 16, -58]}
         starBurst={false}
         ghostScale={0.28}
@@ -126,13 +139,12 @@ function Effect() {
         flareSpeed={0.4}
         glareSize={0.35}
         dirtTextureFile={"/lensDirtTexture.png"}
-      />
-      <Bloom
-        intensity={1.4}
-        luminanceThreshold={0.8}
-        luminanceSmoothing={0.07}
-      />
-      {/* <SMAA /> */}
+      /> */}
+
+      <SMAA />
+      <Bloom mipmapBlur luminanceThreshold={0.85} intensity={1} />
+
+      {/* <N8AO {...config} /> */}
     </EffectComposer>
   );
 }

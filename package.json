@@ -16,6 +16,7 @@
     "@types/three": "^0.152.0",
     "leva": "^0.9.34",
     "maath": "^0.5.3",
+    "n8ao": "^1.5.1",
     "postprocessing": "^6.31.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

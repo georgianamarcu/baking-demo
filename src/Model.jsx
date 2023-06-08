@@ -10,11 +10,7 @@ import {
 } from "three";
 
 export function Model(props) {
-  const walls = useRef();
-  const cabinet = useRef();
-  const cushion = useRef();
-  const floor = useRef();
-  const { nodes, materials, animations } = useGLTF("/room.glb");
+  const { nodes, materials } = useGLTF("/bakingDemo-v1.glb");
   const fixAlbedo = (texture, repeat) => {
     texture.flipY = false;
     texture.repeat.set(repeat, repeat);
@@ -27,386 +23,435 @@ export function Model(props) {
       texture.colorSpace = SRGBColorSpace;
     });
   };
-  const fixBake = (texture) => {
+
+  const fixNormalTexture = (texture, repeat) => {
     texture.flipY = false;
-    texture.colorSpace = SRGBColorSpace;
+    texture.colorSpace = LinearSRGBColorSpace;
+    texture.wrapS = RepeatWrapping;
+    texture.wrapT = RepeatWrapping;
+    texture.repeat.set(repeat, repeat);
   };
-  const [floorAlbedo, cushionAlbedo, pillow1Albedo, pillow2Albedo, floorAO] =
-    useTexture([
-      "/albedos/TWF-0039 Diffuse 4K.jpg",
-      "/albedos/SofaFabricJulia_diffuse.jpg",
-      "/albedos/Fabric7_diffuse.jpg",
-      "/albedos/Fabric_Glossiness.jpg",
-      "/bakes/Floor_ao_PBR_Ambient Occlusion.jpg",
-    ]);
-  const bakedTextures = useKTX2([
-    "/bakes/Room_ao_PBR_Ambient Occlusion.ktx2",
-    "/bakes/Room_walls_PBR_Lightmap.ktx2",
-    "/bakes/Wall Cabinet_ao_PBR_Ambient Occlusion.ktx2",
-    "/bakes/WindowCusion_ao_PBR_Ambient Occlusion.ktx2",
-    "/bakes/WindowCusion.001_cushion_PBR_Lightmap.ktx2",
-    "/bakes/Floor_LighMap_PBR_Lightmap.ktx2",
-    "/bakes/Wall Cabinet_LighMap_PBR_Lightmap.ktx2",
-  ]);
-  fixAlbedo(floorAlbedo, 1);
-  fixAlbedo(cushionAlbedo, 10);
-  fixAlbedo(pillow1Albedo, 1);
-  fixAlbedo(pillow2Albedo, 4);
-  fixBake(floorAO);
-  fixBaked(bakedTextures);
+
+  const bakedTextures = {
+    plintAO: "/baked/Baseboard_AO_PBR_Ambient Occlusion.ktx2",
+    ceilingAO: "/baked/Ceiling_AO_PBR_Ambient Occlusion.ktx2",
+    deskAO: "/baked/Desk.001_AO_PBR_Ambient Occlusion.ktx2",
+    floorAO: "/baked/Floor_AO_PBR_Ambient Occlusion.ktx2",
+    drawersAO: "/baked/Roundcube.001_AO_PBR_Ambient Occlusion.ktx2",
+    chairAO: "/baked/Tulip Chair Top_AO_PBR_Ambient Occlusion.ktx2",
+    roomAO: "/baked/Room_AO_PBR_Ambient Occlusion.ktx2",
+  };
+  const albedos = {
+    deskAlbedo: "/textures/Wood_Robinia_Branson_Truffle_Diffuse_4k.ktx2",
+    lampAlbedo: "/textures/Plane.012_metal_PBR_Diffuse.ktx2",
+    floorAlbedo: "/textures/TWF-0022 Diffuse 4K.ktx2",
+    chairAlbedo: "/textures/Fabric036_4K_Color.ktx2",
+  };
+  const normals = {
+    lampNormals: "/textures/Plane.012_metal_PBR_Normal.ktx2",
+  };
+  const roughness = {
+    lampRoughness: "/textures/Plane.012_metal_PBR_Roughness.ktx2",
+  };
+
   const [
-    wallsAO,
-    wallsLM,
-    cabinetAO,
-    cushionAO,
-    cushionLM,
-    floorLM,
-    cabinetLM,
-  ] = bakedTextures ?? null;
+    plintAO,
+    ceilingAO,
+    deskAO,
+    floorAO,
+    drawersAO,
+    chairAO,
+    roomAO,
+    deskAlbedo,
+    lampAlbedo,
+    lampNormals,
+    lampRoughness,
+    floorAlbedo,
+    chairAlbedo,
+  ] = useKTX2([
+    bakedTextures.plintAO,
+    bakedTextures.ceilingAO,
+    bakedTextures.deskAO,
+    bakedTextures.floorAO,
+    bakedTextures.drawersAO,
+    bakedTextures.chairAO,
+    bakedTextures.roomAO,
+    albedos.deskAlbedo,
+    albedos.lampAlbedo,
+    normals.lampNormals,
+    roughness.lampRoughness,
+    albedos.floorAlbedo,
+    albedos.chairAlbedo,
+  ]);
+  fixBaked([plintAO, ceilingAO, deskAO, floorAO, drawersAO, chairAO, roomAO]);
+  fixAlbedo(deskAlbedo, 1);
+  fixAlbedo(lampAlbedo, 4);
+  fixAlbedo(chairAlbedo, 4);
+  fixAlbedo(lampRoughness, 4);
+  fixAlbedo(floorAlbedo, 1);
+  fixNormalTexture(lampNormals, 4);
+
+  const plintRef = useRef();
+  const ceilingRef = useRef();
+  const deskRef = useRef();
+  const floorRef = useRef();
+  const drawersRef = useRef();
+  const chairRef = useRef();
+  const roomRef = useRef();
+
   useLayoutEffect(() => {
-    walls.current.geometry.attributes.uv2 =
-      walls.current.geometry.attributes.uv;
-    cabinet.current.geometry.attributes.uv2 =
-      cabinet.current.geometry.attributes.uv;
-    cushion.current.geometry.attributes.uv2 =
-      cushion.current.geometry.attributes.uv;
-    floor.current.geometry.attributes.uv2 =
-      floor.current.geometry.attributes.uv;
+    plintRef.current.geometry.attributes.uv2 =
+      plintRef.current.geometry.attributes.uv;
+    ceilingRef.current.geometry.attributes.uv2 =
+      ceilingRef.current.geometry.attributes.uv;
+    deskRef.current.geometry.attributes.uv2 =
+      deskRef.current.geometry.attributes.uv;
+    floorRef.current.geometry.attributes.uv2 =
+      floorRef.current.geometry.attributes.uv;
+    drawersRef.current.geometry.attributes.uv2 =
+      drawersRef.current.geometry.attributes.uv;
+    chairRef.current.geometry.attributes.uv2 =
+      chairRef.current.geometry.attributes.uv;
+    roomRef.current.geometry.attributes.uv2 =
+      roomRef.current.geometry.attributes.uv;
   }, []);
+
   return (
-    <group {...props} dispose={null}>
+    <group {...props} dispose={null} scale={1}>
       <mesh
+        ref={deskRef}
+        geometry={nodes.Desk001.geometry}
+        material={materials["iMeshh Wood70 4K.001"]}
+        position={[-0.059966, 0, 0.050772]}
+        rotation={[0, -1.570535, 0]}
+      >
+        <meshStandardMaterial
+          map={deskAlbedo}
+          aoMap={deskAO}
+          aoMapIntensity={0.8}
+          envMapIntensity={1.1}
+          roughness={0.7}
+        />
+      </mesh>
+      <group position={[-0.059966, 0, 0.050772]} rotation={[0, -1.570535, 0]}>
+        <mesh
+          ref={drawersRef}
+          geometry={nodes.Roundcube001.geometry}
+          material={materials["iMeshh Wood70 4K.001"]}
+          position={[0.222136, 0.613031, -0.496007]}
+        >
+          <meshStandardMaterial
+            map={deskAlbedo}
+            aoMap={drawersAO}
+            roughness={0.7}
+            aoMapIntensity={0.8}
+          />
+        </mesh>
+      </group>
+      <group
+        position={[0.431448, 0.784661, 0.235016]}
+        rotation={[Math.PI / 2, 0, -0.129959]}
+        scale={[1, 1, 1.183377]}
+      >
+        <mesh
+          geometry={nodes.Plane003_1.geometry}
+          material={materials["Magazine Cover1.001"]}
+        />
+        <mesh
+          geometry={nodes.Plane003_2.geometry}
+          material={materials["Magazine Edge.001"]}
+        />
+      </group>
+      <group
+        position={[0.421017, 0.768425, 0.236253]}
+        rotation={[Math.PI / 2, 0, -0.233391]}
+        scale={[0.937412, 0.937412, 1.945639]}
+      >
+        <mesh
+          geometry={nodes.Plane005_1.geometry}
+          material={materials["Magazine Cover1.002"]}
+        />
+        <mesh
+          geometry={nodes.Plane005_2.geometry}
+          material={materials["Magazine Edge.001"]}
+        />
+      </group>
+      <mesh
+        ref={roomRef}
+        geometry={nodes.Room.geometry}
+        position={[2.376106, 0, 2.693998]}
+        rotation={[0, 1.570535, 0]}
+      >
+        <meshStandardMaterial
+          aoMap={roomAO}
+          aoMapIntensity={0.8}
+          color={new Color(0x25333e)}
+        />
+      </mesh>
+      <mesh
+        ref={plintRef}
         geometry={nodes.Baseboard.geometry}
-        material={materials["Baseboard_material.001"]}
-        position={[-1.496321, 0, 0.207386]}
-        scale={[1, 1, 0.821515]}
-      />
+        material={materials.Baseboard_material}
+        position={[2.376106, 0, 2.693998]}
+        rotation={[0, 1.570535, 0]}
+      >
+        <meshStandardMaterial
+          aoMap={plintAO}
+          aoMapIntensity={0.7}
+          envMapIntensity={1.2}
+        />
+      </mesh>
       <mesh
-        ref={floor}
+        ref={floorRef}
         geometry={nodes.Floor.geometry}
-        position={[0, 0, 1.184006]}
-        scale={1.494426}
+        material={materials.Floor_material}
+        position={[2.376106, 0, 2.693998]}
+        rotation={[0, 1.570535, 0]}
       >
         <meshStandardMaterial
           map={floorAlbedo}
           aoMap={floorAO}
-          aoMapIntensity={0.7}
-          envMapIntensity={1.1}
-          lightMap={floorLM}
-          lightMapIntensity={1.5}
+          aoMapIntensity={0.9}
+          roughness={0.8}
         />
       </mesh>
       <mesh
-        geometry={nodes.ceiling.geometry}
-        position={[0, 2.786496, 1.184006]}
-        scale={1.494426}
-      >
-        <meshBasicMaterial color="white" />
-      </mesh>
-      <mesh
-        ref={cushion}
-        geometry={nodes.WindowCusion.geometry}
-        position={[-0.000338, 0.614499, -0.026264]}
-        rotation={[Math.PI / 2, 0, 0]}
-        scale={[0.852323, 0.740355, 0.852323]}
+        ref={ceilingRef}
+        geometry={nodes.Ceiling.geometry}
+        material={materials.Ceiling_material}
+        position={[2.376106, 0, 2.693998]}
+        rotation={[0, 1.570535, 0]}
       >
         <meshStandardMaterial
-          map={cushionAlbedo}
-          aoMap={cushionAO}
-          aoMapIntensity={0.6}
-          // lightMap={cushionLM}
-          // lightMapIntensity={2}
+          aoMap={ceilingAO}
+          aoMapIntensity={1.1}
+          emissive={"#FFFFFF"}
+          emissiveIntensity={0.25}
         />
       </mesh>
       <group
-        position={[-0.000338, 0.614499, -0.026264]}
-        rotation={[Math.PI / 2, 0, 0]}
-        scale={[0.852323, 0.740355, 0.852323]}
+        position={[2.374411, 1.239825, 0.676351]}
+        rotation={[0, -1.570535, 0]}
       >
         <mesh
-          geometry={nodes.WindowCusion001.geometry}
-          position={[-0.01093, 0.047011, 0.003893]}
-          scale={[1, 1.151235, 1]}
-        >
-          <meshStandardMaterial map={pillow2Albedo} />
-        </mesh>
+          geometry={nodes.Plane015.geometry}
+          material={materials["1200WindowFrame2 "]}
+        />
         <mesh
-          geometry={nodes.WindowCusion002.geometry}
-          position={[0, 0.051432, 0.003893]}
-          scale={[1, 1.151235, 1]}
-        >
-          <meshStandardMaterial map={pillow1Albedo} />
-        </mesh>
+          geometry={nodes.Plane015_1.geometry}
+          material={materials["1200WindowFrame2 "]}
+        />
       </group>
       <mesh
-        ref={walls}
-        geometry={nodes.Room.geometry}
-        position={[-1.492754, 0, -0.318267]}
-      >
-        <meshStandardMaterial
-          aoMap={wallsAO}
-          aoMapIntensity={0.5}
-          lightMap={wallsLM}
-          lightMapIntensity={1.5}
-          envMapIntensity={0.9}
-          color={"#B6C2B8"}
-        />
-      </mesh>
-
-      <group position={[0.015524, 0.63437, -0.330901]} scale={1.530393}>
-        <mesh
-          geometry={nodes.Plane.geometry}
-          material={materials["iMeshh Window"]}
-        />
-        <mesh
-          geometry={nodes.Plane_1.geometry}
-          material={materials["window secruity red.001"]}
-        />
-        <mesh geometry={nodes.Plane_2.geometry} material={materials.string} />
-        <mesh
-          geometry={nodes.Plane_3.geometry}
-          material={materials["iMeshh Trim"]}
-        />
-      </group>
-      {/* <mesh
-        geometry={nodes["Window-4001"].geometry}
-        material={materials.glass}
-        position={[0.015524, 0.63437, -0.330901]}
-        scale={1.530393}
-      /> */}
-      <mesh
-        ref={cabinet}
-        geometry={nodes.Wall_Cabinet.geometry}
-        position={[-1.495224, 0.596676, 1.1378]}
-        rotation={[0, Math.PI / 2, 0]}
-      >
-        <meshStandardMaterial
-          aoMap={cabinetAO}
-          aoMapIntensity={0.75}
-          envMapIntensity={1}
-          roughness={0.5}
-          lightMap={cabinetLM}
-          lightMapIntensity={1.4}
-        />
-      </mesh>
+        geometry={nodes["1200_Window_Glass"].geometry}
+        material={materials.Glass}
+        position={[2.374411, 1.239825, 0.676351]}
+        rotation={[0, -1.570535, 0]}
+      />
       <group
-        position={[-1.495224, 0.596676, 1.1378]}
-        rotation={[0, Math.PI / 2, 0]}
+        position={[-0.058407, 1.552035, -0.263254]}
+        rotation={[-Math.PI / 2, 0, -Math.PI]}
+        scale={0.22748}
       >
-        <group
-          position={[-0.435478, 0.256874, 0.185481]}
-          rotation={[0, Math.PI / 2, 0]}
-          scale={0.850309}
-        >
-          <mesh
-            geometry={nodes.Cube002.geometry}
-            material={materials["Metal Simple Marked.001"]}
-          />
-          <mesh
-            geometry={nodes.Cube002_1.geometry}
-            material={materials.Marble}
-          />
-          <mesh
-            geometry={nodes.Cube002_2.geometry}
-            material={materials.wire_006134006}
-          />
-        </group>
         <mesh
-          geometry={nodes.Cylinder002.geometry}
-          material={materials["Concrete.001"]}
-          position={[0.474882, 0.190962, 0.256317]}
-          rotation={[-Math.PI, 1.386892, -Math.PI]}
-          scale={0.810291}
+          geometry={nodes.iMeshh_Picture_Frame1_1.geometry}
+          material={materials["Black painted Wood"]}
         />
-        <group
-          position={[0.185999, 0.367067, 0.015319]}
-          rotation={[1.519711, 0, 0]}
-          scale={0.163449}
-        >
-          <mesh
-            geometry={nodes.iMeshh_Frame_Set008.geometry}
-            material={materials["Black painted Wood"]}
-          />
-          <mesh
-            geometry={nodes.iMeshh_Frame_Set008_1.geometry}
-            material={materials.floor}
-          />
-          <mesh
-            geometry={nodes.iMeshh_Frame_Set008_2.geometry}
-            material={materials["Picture.012"]}
-          />
-          <mesh geometry={nodes.iMeshh_Frame_Set008_3.geometry}>
-            <meshStandardMaterial
-              transparent={true}
-              opacity={0.2}
-              roughness={0.1}
-            />
-          </mesh>
-        </group>
-        <group
-          position={[-0.159329, 0.204049, 0.247198]}
-          rotation={[1.571228, 0.001684, -1.819167]}
-          scale={[1.185288, 1.185288, 1.402642]}
-        >
-          <mesh
-            geometry={nodes.Plane021.geometry}
-            material={materials["Magazine Cover1.025"]}
-          />
-          <mesh
-            geometry={nodes.Plane021_1.geometry}
-            material={materials["Magazine Edge.016"]}
-          />
-        </group>
-        <group
-          position={[-0.161067, 0.210933, 0.247253]}
-          rotation={[Math.PI / 2, 0, -1.788927]}
-          scale={[1.111103, 1.111103, 1.640584]}
-        >
-          <mesh
-            geometry={nodes.Plane004.geometry}
-            material={materials["Magazine Cover1.026"]}
-          />
-          <mesh
-            geometry={nodes.Plane004_1.geometry}
-            material={materials["Magazine Edge.016"]}
-          />
-        </group>
-        <group
-          position={[-0.151329, 0.238636, 0.242613]}
-          rotation={[Math.PI / 2, 0, -1.800264]}
-          scale={[1.185288, 1.185288, 1.402642]}
-        >
-          <mesh
-            geometry={nodes.Plane023.geometry}
-            material={materials["Magazine Cover1.027"]}
-          />
-          <mesh
-            geometry={nodes.Plane023_1.geometry}
-            material={materials["Magazine Edge.016"]}
-          />
-        </group>
-        <group
-          position={[-0.151316, 0.232763, 0.242202]}
-          rotation={[Math.PI / 2, 0, -1.926095]}
-          scale={[1.04896, 1.04896, 1.743117]}
-        >
-          <mesh
-            geometry={nodes.Plane024.geometry}
-            material={materials["Magazine Cover1.028"]}
-          />
-          <mesh
-            geometry={nodes.Plane024_1.geometry}
-            material={materials["Magazine Edge.016"]}
-          />
-        </group>
-        <group
-          position={[-0.168044, 0.258401, 0.263961]}
-          rotation={[Math.PI / 2, 0, -1.596435]}
-          scale={[1.185288, 1.185288, 1.505333]}
-        >
-          <mesh
-            geometry={nodes.Plane025.geometry}
-            material={materials["Magazine Cover1.029"]}
-          />
-          <mesh
-            geometry={nodes.Plane025_1.geometry}
-            material={materials["Magazine Edge.016"]}
-          />
-        </group>
-        <group
-          position={[-0.161067, 0.242056, 0.247253]}
-          rotation={[Math.PI / 2, 0, -1.788927]}
-          scale={[1.111103, 1.111103, 1.640584]}
-        >
-          <mesh
-            geometry={nodes.Plane022.geometry}
-            material={materials["Magazine Cover1.026"]}
-          />
-          <mesh
-            geometry={nodes.Plane022_1.geometry}
-            material={materials["Magazine Edge.016"]}
-          />
-        </group>
-        <group
-          position={[0.47445, 0.237662, 0.266582]}
-          rotation={[-Math.PI, 1.386892, -Math.PI]}
-          scale={0.01342}
-        >
-          <mesh
-            geometry={nodes.Palm1001_1.geometry}
-            material={materials["iMeshh Aloe"]}
-          />
-          <mesh
-            geometry={nodes.Palm1001_2.geometry}
-            material={materials["Grass Material.001"]}
-          />
-        </group>
-        <group
-          position={[-0.066054, 0.192568, 0.113895]}
-          rotation={[-Math.PI, 1.338744, -Math.PI]}
-          scale={0.61129}
-        >
-          <mesh
-            geometry={nodes.Sphere_1.geometry}
-            material={materials["Plain Wall Panel"]}
-          />
-          <mesh
-            geometry={nodes.Sphere_2.geometry}
-            material={materials["Candle Thin"]}
-          />
-          <mesh
-            geometry={nodes.Sphere_3.geometry}
-            material={materials["Wick.002"]}
-          />
-          <mesh
-            geometry={nodes.Sphere_4.geometry}
-            material={materials["Candle Light 1.002"]}
-          />
-        </group>
-        <group
-          position={[-0.143858, 0.192568, 0.132281]}
-          rotation={[-Math.PI, 1.338744, -Math.PI]}
-          scale={0.61129}
-        >
-          <mesh
-            geometry={nodes.Sphere_1.geometry}
-            material={materials["Plain Wall Panel"]}
-          />
-          <mesh
-            geometry={nodes.Sphere_2.geometry}
-            material={materials["Candle Thin"]}
-          />
-          <mesh
-            geometry={nodes.Sphere_3.geometry}
-            material={materials["Wick.002"]}
-          />
-          <mesh
-            geometry={nodes.Sphere_4.geometry}
-            material={materials["Candle Light 1.002"]}
-          />
-        </group>
+        <mesh
+          geometry={nodes.iMeshh_Picture_Frame1_2.geometry}
+          material={materials.Picture3}
+        />
       </group>
-      <group position={[-1.102069, 1.977591, 0.190852]}>
+      <group
+        position={[-0.632793, 1.551956, -0.263455]}
+        rotation={[Math.PI / 2, 0, Math.PI]}
+        scale={0.385098}
+      >
         <mesh
-          geometry={nodes.Decoration_Clock_Black_White_01_1.geometry}
-          material={materials.Plastic_Universal_Black}
+          geometry={nodes.iMeshh_Picture_Frame1002.geometry}
+          material={materials["Black painted Wood"]}
         />
         <mesh
-          geometry={nodes.Decoration_Clock_Black_White_01_2.geometry}
-          material={materials.floor}
+          geometry={nodes.iMeshh_Picture_Frame1002_1.geometry}
+          material={materials.Picture2}
+        />
+      </group>
+      <group
+        position={[0.510842, 1.551916, -0.262681]}
+        rotation={[-Math.PI / 2, -Math.PI / 2, 0]}
+        scale={0.55}
+      >
+        <mesh
+          geometry={nodes.iMeshh_Picture_Frame1001_1.geometry}
+          material={materials["Black painted Wood"]}
         />
         <mesh
-          geometry={nodes.Decoration_Clock_Black_White_01_3.geometry}
-          material={materials["iMeshh Wood0129 Black"]}
+          geometry={nodes.iMeshh_Picture_Frame1001_2.geometry}
+          material={materials.Picture1}
         />
-        <mesh geometry={nodes.Decoration_Clock_Black_White_01_4.geometry}>
+      </group>
+      <mesh
+        geometry={nodes.Plane.geometry}
+        material={materials.crowning}
+        position={[-2.193169, 1.224893, -0.3293]}
+        rotation={[-Math.PI / 2, 0, 0]}
+        scale={[0.239658, 1, 0.64415]}
+      />
+      <mesh
+        geometry={nodes.Plane003.geometry}
+        material={materials.crowning}
+        position={[-1.465852, 1.224893, -0.3293]}
+        rotation={[-Math.PI / 2, 0, 0]}
+        scale={[0.239658, 1, 0.64415]}
+      />
+      <mesh
+        geometry={nodes.Plane006.geometry}
+        material={materials.crowning}
+        position={[1.264254, 1.224893, -0.3293]}
+        rotation={[-Math.PI / 2, 0, 0]}
+        scale={[0.239658, 1, 0.64415]}
+      />
+      <mesh
+        geometry={nodes.Plane009.geometry}
+        material={materials.crowning}
+        position={[2.012831, 1.224893, -0.3293]}
+        rotation={[-Math.PI / 2, 0, 0]}
+        scale={[0.239658, 1, 0.64415]}
+      />
+      <mesh
+        geometry={nodes.Plane002.geometry}
+        material={materials.crowning}
+        position={[-2.193169, 2.052421, -0.333092]}
+        rotation={[-Math.PI / 2, 0, 0]}
+        scale={[0.239658, 1, 0.107914]}
+      />
+      <mesh
+        geometry={nodes.Plane001.geometry}
+        material={materials.crowning}
+        position={[-2.193169, 0.369506, -0.333092]}
+        rotation={[-Math.PI / 2, 0, 0]}
+        scale={[0.239658, 1, 0.107914]}
+      />
+      <mesh
+        geometry={nodes.Plane004.geometry}
+        material={materials.crowning}
+        position={[-1.465852, 2.052421, -0.333092]}
+        rotation={[-Math.PI / 2, 0, 0]}
+        scale={[0.239658, 1, 0.107914]}
+      />
+      <mesh
+        geometry={nodes.Plane005.geometry}
+        material={materials.crowning}
+        position={[-1.465852, 0.369506, -0.333092]}
+        rotation={[-Math.PI / 2, 0, 0]}
+        scale={[0.239658, 1, 0.107914]}
+      />
+      <mesh
+        geometry={nodes.Plane007.geometry}
+        material={materials.crowning}
+        position={[1.264254, 2.052421, -0.333092]}
+        rotation={[-Math.PI / 2, 0, 0]}
+        scale={[0.239658, 1, 0.107914]}
+      />
+      <mesh
+        geometry={nodes.Plane008.geometry}
+        material={materials.crowning}
+        position={[1.264254, 0.369506, -0.333092]}
+        rotation={[-Math.PI / 2, 0, 0]}
+        scale={[0.239658, 1, 0.107914]}
+      />
+      <mesh
+        geometry={nodes.Plane010.geometry}
+        material={materials.crowning}
+        position={[2.012831, 2.052421, -0.333092]}
+        rotation={[-Math.PI / 2, 0, 0]}
+        scale={[0.239658, 1, 0.107914]}
+      />
+      <mesh
+        geometry={nodes.Plane011.geometry}
+        material={materials.crowning}
+        position={[2.012831, 0.369506, -0.333092]}
+        rotation={[-Math.PI / 2, 0, 0]}
+        scale={[0.239658, 1, 0.107914]}
+      />
+      <group position={[-0.580647, 0.756357, 0.01742]} scale={0.56}>
+        <mesh
+          geometry={nodes.Ottolo_Lamp_replica_1.geometry}
+          material-toneMapped={false}
+        >
           <meshStandardMaterial
-            transparent={true}
-            opacity={0.2}
-            roughness={0.1}
+            map={lampAlbedo}
+            normalMap={lampNormals}
+            roughnessMap={lampRoughness}
+            metalness={1}
           />
         </mesh>
+        {/* <mesh
+          geometry={nodes.Ottolo_Lamp_replica_2.geometry}
+          material={materials["Inside Filament"]}
+        /> */}
+        <mesh
+          geometry={nodes.Ottolo_Lamp_replica_3.geometry}
+          material={materials.LED}
+        />
+        <mesh
+          geometry={nodes.Ottolo_Lamp_replica_4.geometry}
+          material={materials.Metal}
+        />
+        <mesh
+          geometry={nodes.Ottolo_Lamp_replica_5.geometry}
+          material={materials.Plastic}
+        />
+        <mesh
+          geometry={nodes.Ottolo_Lamp_replica_6.geometry}
+          material={materials["Bulb Glass"]}
+        />
+        <mesh
+          geometry={nodes.Ottolo_Lamp_replica_7.geometry}
+          material={materials["Base Metal"]}
+        />
+        <mesh
+          geometry={nodes.BezierCurve018.geometry}
+          material={materials["Plastic Gloss Black.001"]}
+          position={[-0.070778, 0.002335, -0.33171]}
+          rotation={[-Math.PI, 0.826495, -Math.PI]}
+          scale={0.150301}
+        />
       </group>
+      <mesh
+        geometry={nodes.Ottolo_Lamp_replica001.geometry}
+        position={[-0.580647, 0.756357, 0.01742]}
+        material-toneMapped={false}
+        scale={0.56}
+      >
+        <meshStandardMaterial
+          map={lampAlbedo}
+          normalMap={lampNormals}
+          roughnessMap={lampRoughness}
+          metalness={1}
+        />
+      </mesh>
+      <mesh
+        geometry={nodes.Tulip_Chair_Legs.geometry}
+        position={[0, 0, 0.520791]}
+        rotation={[Math.PI, -0.610865, Math.PI]}
+      >
+        <meshStandardMaterial metalness={1} roughness={0.1} />
+      </mesh>
+      <mesh
+        ref={chairRef}
+        geometry={nodes.Tulip_Chair_Top.geometry}
+        material={materials["McAlister Plain Chenille Taupe"]}
+        position={[0, 0, 0.520791]}
+        rotation={[Math.PI, -0.610865, Math.PI]}
+      >
+        <meshStandardMaterial
+          map={chairAlbedo}
+          aoMap={chairAO}
+          aoMapIntensity={0.7}
+          envMapIntensity={1}
+        />
+      </mesh>
     </group>
   );
 }
