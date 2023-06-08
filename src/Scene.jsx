@@ -21,7 +21,7 @@ import ImagesIcon from "./ImagesIcon";
 function Scene(props) {
   const camera = useRef();
   const [maps, setMaps] = useState(true);
-  const [changemap, setChangeMap] = useState(false);
+  const [changemap, setChangeMap] = useState(true);
   return (
     <group position={props.position}>
       <Center>
