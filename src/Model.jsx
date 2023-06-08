@@ -1,5 +1,11 @@
 import React, { useRef, useLayoutEffect } from "react";
-import { useGLTF, useTexture, useAnimations, useKTX2 } from "@react-three/drei";
+import {
+  useGLTF,
+  useTexture,
+  useAnimations,
+  useKTX2,
+  MeshTransmissionMaterial,
+} from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import {
   SRGBColorSpace,
@@ -40,6 +46,12 @@ export function Model(props) {
     drawersAO: "/baked/Roundcube.001_AO_PBR_Ambient Occlusion.ktx2",
     chairAO: "/baked/Tulip Chair Top_AO_PBR_Ambient Occlusion.ktx2",
     roomAO: "/baked/Room_AO_PBR_Ambient Occlusion.ktx2",
+    plintLM: "/baked/Baseboard_LighMap2_PBR_Lightmap.ktx2",
+    deskLM: "/baked/Desk.001_LighMap2_PBR_Lightmap.ktx2",
+    floorLM: "/baked/Floor_LighMap2_PBR_Lightmap.ktx2",
+    roomLM: "/baked/Room_LighMap2_PBR_Lightmap.ktx2",
+    drawersLM: "/baked/Roundcube.001_LighMap2_PBR_Lightmap.ktx2",
+    chairLM: "/baked/Tulip Chair Top_LighMap2_PBR_Lightmap.ktx2",
   };
   const albedos = {
     deskAlbedo: "/textures/Wood_Robinia_Branson_Truffle_Diffuse_4k.ktx2",
@@ -68,6 +80,12 @@ export function Model(props) {
     lampRoughness,
     floorAlbedo,
     chairAlbedo,
+    plintLM,
+    deskLM,
+    floorLM,
+    roomLM,
+    drawersLM,
+    chairLM,
   ] = useKTX2([
     bakedTextures.plintAO,
     bakedTextures.ceilingAO,
@@ -82,9 +100,33 @@ export function Model(props) {
     roughness.lampRoughness,
     albedos.floorAlbedo,
     albedos.chairAlbedo,
+    bakedTextures.plintLM,
+    bakedTextures.deskLM,
+    bakedTextures.floorLM,
+    bakedTextures.roomLM,
+    bakedTextures.drawersLM,
+    bakedTextures.chairLM,
   ]);
-  fixBaked([plintAO, ceilingAO, deskAO, floorAO, drawersAO, chairAO, roomAO]);
+  // const woodJpeg = useTexture(
+  //   "/textures/Wood_Robinia_Branson_Truffle_Diffuse_4kJPG.jpg"
+  // );
+  fixBaked([
+    plintAO,
+    ceilingAO,
+    deskAO,
+    floorAO,
+    drawersAO,
+    chairAO,
+    roomAO,
+    plintLM,
+    deskLM,
+    floorLM,
+    roomLM,
+    drawersLM,
+    chairLM,
+  ]);
   fixAlbedo(deskAlbedo, 1);
+  // fixAlbedo(woodJpeg, 1);
   fixAlbedo(lampAlbedo, 4);
   fixAlbedo(chairAlbedo, 4);
   fixAlbedo(lampRoughness, 4);
@@ -128,9 +170,11 @@ export function Model(props) {
         <meshStandardMaterial
           map={deskAlbedo}
           aoMap={deskAO}
-          aoMapIntensity={0.8}
-          envMapIntensity={1.1}
+          aoMapIntensity={props.maps === true ? 0.8 : 0}
+          envMapIntensity={0.9}
           roughness={0.7}
+          lightMap={deskLM}
+          lightMapIntensity={props.maps === true ? 0.8 : 0}
         />
       </mesh>
       <group position={[-0.059966, 0, 0.050772]} rotation={[0, -1.570535, 0]}>
@@ -144,7 +188,9 @@ export function Model(props) {
             map={deskAlbedo}
             aoMap={drawersAO}
             roughness={0.7}
-            aoMapIntensity={0.8}
+            aoMapIntensity={props.maps === true ? 0.8 : 0}
+            lightMap={drawersLM}
+            lightMapIntensity={props.maps === true ? 1.4 : 0}
           />
         </mesh>
       </group>
@@ -184,8 +230,10 @@ export function Model(props) {
       >
         <meshStandardMaterial
           aoMap={roomAO}
-          aoMapIntensity={0.8}
+          aoMapIntensity={props.maps === true ? 0.8 : 0}
           color={new Color(0x25333e)}
+          lightMap={roomLM}
+          lightMapIntensity={props.maps === true ? 1.3 : 0}
         />
       </mesh>
       <mesh
@@ -197,8 +245,10 @@ export function Model(props) {
       >
         <meshStandardMaterial
           aoMap={plintAO}
-          aoMapIntensity={0.7}
-          envMapIntensity={1.2}
+          aoMapIntensity={props.maps === true ? 0.7 : 0}
+          envMapIntensity={1}
+          lightMap={plintLM}
+          lightMapIntensity={props.maps === true ? 1.2 : 0}
         />
       </mesh>
       <mesh
@@ -211,7 +261,10 @@ export function Model(props) {
         <meshStandardMaterial
           map={floorAlbedo}
           aoMap={floorAO}
-          aoMapIntensity={0.9}
+          lightMap={floorLM}
+          aoMapIntensity={props.maps === true ? 0.9 : 0}
+          lightMapIntensity={props.maps === true ? 1.4 : 0}
+          envMapIntensity={0.8}
           roughness={0.8}
         />
       </mesh>
@@ -244,10 +297,16 @@ export function Model(props) {
       </group>
       <mesh
         geometry={nodes["1200_Window_Glass"].geometry}
-        material={materials.Glass}
         position={[2.374411, 1.239825, 0.676351]}
         rotation={[0, -1.570535, 0]}
-      />
+      >
+        <meshStandardMaterial
+          toneMapped={false}
+          color={"white"}
+          emissive={"white"}
+          emissiveIntensity={0.63}
+        />
+      </mesh>
       <group
         position={[-0.058407, 1.552035, -0.263254]}
         rotation={[-Math.PI / 2, 0, -Math.PI]}
@@ -386,10 +445,10 @@ export function Model(props) {
             metalness={1}
           />
         </mesh>
-        {/* <mesh
+        <mesh
           geometry={nodes.Ottolo_Lamp_replica_2.geometry}
           material={materials["Inside Filament"]}
-        /> */}
+        />
         <mesh
           geometry={nodes.Ottolo_Lamp_replica_3.geometry}
           material={materials.LED}
@@ -448,8 +507,10 @@ export function Model(props) {
         <meshStandardMaterial
           map={chairAlbedo}
           aoMap={chairAO}
-          aoMapIntensity={0.7}
-          envMapIntensity={1}
+          aoMapIntensity={props.maps === true ? 0.7 : 0}
+          envMapIntensity={0.8}
+          lightMap={chairLM}
+          lightMapIntensity={props.maps === true ? 1.4 : 0}
         />
       </mesh>
     </group>

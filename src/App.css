@@ -48,8 +48,14 @@ h1 {
   align-items: center;
   cursor: pointer;
   border-radius: 50%;
-  background: #e1e0e0;
-  box-shadow: 4px 4px 9px #bfbebe53,
-    -4px -4px 9px #ffffff5f;
+  background: #e0e0e0;
 
+}
+
+.icons {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
 }
