@@ -27,14 +27,14 @@ function Scene(props) {
       <Center>
         <Model scale={1} name="room" maps={maps} changemap={changemap} />
         <Html position={[-0.8, 0.9, 0]}>
-          {/* <div className="icons"> */}
-          <div className="lamp-icon" onClick={() => setMaps(!maps)}>
-            <LampIcon />
-          </div>
-          {/* <div className="lamp-icon" onClick={() => setChangeMap(!changemap)}>
+          <div className="icons">
+            <div className="lamp-icon" onClick={() => setMaps(!maps)}>
+              <LampIcon />
+            </div>
+            <div className="lamp-icon" onClick={() => setChangeMap(!changemap)}>
               <ImagesIcon />
-            </div> */}
-          {/* </div> */}
+            </div>
+          </div>
         </Html>
         <Effect />
       </Center>

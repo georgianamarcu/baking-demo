@@ -107,9 +107,9 @@ export function Model(props) {
     bakedTextures.drawersLM,
     bakedTextures.chairLM,
   ]);
-  // const woodJpeg = useTexture(
-  //   "/textures/Wood_Robinia_Branson_Truffle_Diffuse_4kJPG.jpg"
-  // );
+  const woodJpeg = useTexture(
+    "/textures/Wood_Robinia_Branson_Truffle_Diffuse_4kJPG.jpg"
+  );
   fixBaked([
     plintAO,
     ceilingAO,
@@ -126,7 +126,7 @@ export function Model(props) {
     chairLM,
   ]);
   fixAlbedo(deskAlbedo, 1);
-  // fixAlbedo(woodJpeg, 1);
+  fixAlbedo(woodJpeg, 1);
   fixAlbedo(lampAlbedo, 4);
   fixAlbedo(chairAlbedo, 4);
   fixAlbedo(lampRoughness, 4);
@@ -168,7 +168,7 @@ export function Model(props) {
         rotation={[0, -1.570535, 0]}
       >
         <meshStandardMaterial
-          map={deskAlbedo}
+          map={props.changemap === true ? deskAlbedo : woodJpeg}
           aoMap={deskAO}
           aoMapIntensity={props.maps === true ? 0.8 : 0}
           envMapIntensity={0.9}
