@@ -1,27 +1,36 @@
-import React, { useRef, useLayoutEffect } from "react";
-import {
-  useGLTF,
-  useTexture,
-  useAnimations,
-  useKTX2,
-  MeshTransmissionMaterial,
-} from "@react-three/drei";
-import { useFrame } from "@react-three/fiber";
+import React, { useRef, useLayoutEffect, useEffect } from "react";
+import { useGLTF, useTexture, useKTX2 } from "@react-three/drei";
+import { useFrame, useThree } from "@react-three/fiber";
 import {
   SRGBColorSpace,
   LinearSRGBColorSpace,
   RepeatWrapping,
-  MeshStandardMaterial,
   Color,
 } from "three";
+import { gsap } from "gsap";
+import { useGesture } from "react-use-gesture";
+import * as THREE from "three";
+import { useAppStore } from "./store";
 
 export function Model(props) {
   const { nodes, materials } = useGLTF("/bakingDemo-v1.glb");
+  const update = useAppStore((state) => state.update);
+  const currentTexture = useAppStore((state) => state.currentTexture);
+
   const fixAlbedo = (texture, repeat) => {
     texture.flipY = false;
     texture.repeat.set(repeat, repeat);
     texture.colorSpace = SRGBColorSpace;
     texture.wrapS = texture.wrapT = RepeatWrapping;
+  };
+
+  const fixAlbedos = (textures, repeat) => {
+    textures.map((texture) => {
+      texture.flipY = false;
+      texture.repeat.set(repeat, repeat);
+      texture.colorSpace = SRGBColorSpace;
+      texture.wrapS = texture.wrapT = RepeatWrapping;
+    });
   };
   const fixBaked = (textures) => {
     textures.map((texture) => {
@@ -54,10 +63,17 @@ export function Model(props) {
     chairLM: "/baked/Tulip Chair Top_LighMap2_PBR_Lightmap.ktx2",
   };
   const albedos = {
-    deskAlbedo: "/textures/Wood_Robinia_Branson_Truffle_Diffuse_4k.ktx2",
     lampAlbedo: "/textures/Plane.012_metal_PBR_Diffuse.ktx2",
     floorAlbedo: "/textures/TWF-0022 Diffuse 4K.ktx2",
     chairAlbedo: "/textures/Fabric036_4K_Color.ktx2",
+  };
+
+  const deskWood = {
+    robiniaBranson:
+      "/textures/wood/Wood_Robinia_Branson_Truffle_Diffuse_2k.webp",
+    oak1: "/textures/wood/Wood_Maple_Mandal_Natural_Diffuse_2k.webp",
+    oak2: "/textures/wood/Wood_Oak_Vicenza_Grey_Diffuse_2k.webp",
+    walnut: "/textures/wood/Wood_Walnut_Carini_Natural_Diffuse_2k.webp",
   };
   const normals = {
     lampNormals: "/textures/Plane.012_metal_PBR_Normal.ktx2",
@@ -74,7 +90,6 @@ export function Model(props) {
     drawersAO,
     chairAO,
     roomAO,
-    deskAlbedo,
     lampAlbedo,
     lampNormals,
     lampRoughness,
@@ -94,7 +109,6 @@ export function Model(props) {
     bakedTextures.drawersAO,
     bakedTextures.chairAO,
     bakedTextures.roomAO,
-    albedos.deskAlbedo,
     albedos.lampAlbedo,
     normals.lampNormals,
     roughness.lampRoughness,
@@ -107,9 +121,23 @@ export function Model(props) {
     bakedTextures.drawersLM,
     bakedTextures.chairLM,
   ]);
-  const woodJpeg = useTexture(
-    "/textures/Wood_Robinia_Branson_Truffle_Diffuse_4kJPG.jpg"
-  );
+  const [robiniaBranson, oak1, oak2, walnut] = useTexture([
+    deskWood.robiniaBranson,
+    deskWood.oak1,
+    deskWood.oak2,
+    deskWood.walnut,
+  ]);
+
+  const [robiniaBransonClone, oak1Clone, oak2Clone, walnutClone] = [
+    robiniaBranson,
+    oak1,
+    oak2,
+    walnut,
+  ].map((texture) => texture.clone());
+
+  fixAlbedos([robiniaBranson, oak1, oak2, walnut], 2);
+  fixAlbedos([robiniaBransonClone, oak1Clone, oak2Clone, walnutClone], 0.4);
+
   fixBaked([
     plintAO,
     ceilingAO,
@@ -125,8 +153,6 @@ export function Model(props) {
     drawersLM,
     chairLM,
   ]);
-  fixAlbedo(deskAlbedo, 1);
-  fixAlbedo(woodJpeg, 1);
   fixAlbedo(lampAlbedo, 4);
   fixAlbedo(chairAlbedo, 4);
   fixAlbedo(lampRoughness, 4);
@@ -158,8 +184,116 @@ export function Model(props) {
       roomRef.current.geometry.attributes.uv;
   }, []);
 
+  /**ANIMATE CUBES ON HOVER */
+  const cube1 = useRef();
+  const cube2 = useRef();
+  const cube3 = useRef();
+  const cube4 = useRef();
+
+  const HoverUp = (reference, e) => {
+    if (reference.current) {
+      e.stopPropagation();
+      const target = reference.current.position;
+      gsap.to(target, { y: 0.83, duration: 1 });
+    }
+  };
+
+  const ReturnPosition = (reference, e) => {
+    if (reference.current) {
+      e.stopPropagation();
+      const target = reference.current.position;
+      gsap.to(target, { y: 0.8, duration: 1 });
+    }
+  };
+
+  useEffect(() => {
+    switch (currentTexture) {
+      case "robiniaBranson":
+        deskRef.current.material.map = robiniaBranson;
+        drawersRef.current.material.map = robiniaBranson;
+        break;
+      case "oak1":
+        deskRef.current.material.map = oak1;
+        drawersRef.current.material.map = oak1;
+        break;
+      case "oak2":
+        deskRef.current.material.map = oak2;
+        drawersRef.current.material.map = oak2;
+        break;
+      case "walnut":
+        deskRef.current.material.map = walnut;
+        drawersRef.current.material.map = walnut;
+        break;
+      default:
+        deskRef.current.material.map = robiniaBranson;
+        drawersRef.current.material.map = robiniaBranson;
+    }
+  }, [currentTexture, oak1, oak2, robiniaBranson, walnut]);
+
   return (
-    <group {...props} dispose={null} scale={1}>
+    <group {...props} dispose={null} scale={1} position={[0, -0.2, 0]}>
+      {/**CUBES ON DESK */}
+      <mesh
+        ref={cube1}
+        name="cube1"
+        position={[-0.42, 0.8, -0.1]}
+        onPointerEnter={(e) => HoverUp(cube1, e)}
+        onPointerLeave={(e) => ReturnPosition(cube1, e)}
+        onClick={() => update({ currentTexture: "robiniaBranson" })}
+      >
+        <boxGeometry args={[0.08, 0.08, 0.08]} />
+        <meshStandardMaterial
+          map={robiniaBransonClone}
+          envMapIntensity={0.9}
+          roughness={0.7}
+        />
+      </mesh>
+      <mesh
+        ref={cube2}
+        name="cube2"
+        position={[-0.31, 0.8, -0.1]}
+        onPointerEnter={(e) => HoverUp(cube2, e)}
+        onPointerLeave={(e) => ReturnPosition(cube2, e)}
+        onClick={() => update({ currentTexture: "oak1" })}
+      >
+        <boxGeometry args={[0.08, 0.08, 0.08]} />
+        <meshStandardMaterial
+          map={oak1Clone}
+          envMapIntensity={0.9}
+          roughness={0.7}
+        />
+      </mesh>
+      <mesh
+        ref={cube3}
+        name="cube3"
+        position={[-0.2, 0.8, -0.1]}
+        onPointerEnter={(e) => HoverUp(cube3, e)}
+        onPointerLeave={(e) => ReturnPosition(cube3, e)}
+        onClick={() => update({ currentTexture: "oak2" })}
+      >
+        <boxGeometry args={[0.08, 0.08, 0.08]} />
+        <meshStandardMaterial
+          map={oak2Clone}
+          envMapIntensity={0.9}
+          roughness={0.7}
+        />
+      </mesh>
+      <mesh
+        name="cube4"
+        ref={cube4}
+        position={[-0.09, 0.8, -0.1]}
+        onPointerEnter={(e) => HoverUp(cube4, e)}
+        onPointerLeave={(e) => ReturnPosition(cube4, e)}
+        onClick={() => update({ currentTexture: "walnut" })}
+      >
+        <boxGeometry args={[0.08, 0.08, 0.08]} />
+        <meshStandardMaterial
+          map={walnutClone}
+          envMapIntensity={0.9}
+          roughness={0.7}
+        />
+      </mesh>
+
       <mesh
         ref={deskRef}
         geometry={nodes.Desk001.geometry}
@@ -168,10 +302,10 @@ export function Model(props) {
         rotation={[0, -1.570535, 0]}
       >
         <meshStandardMaterial
-          map={props.changemap === true ? deskAlbedo : woodJpeg}
+          map={robiniaBranson}
           aoMap={deskAO}
           aoMapIntensity={props.maps === true ? 0.8 : 0}
-          envMapIntensity={0.9}
+          envMapIntensity={0.8}
           roughness={0.7}
           lightMap={deskLM}
           lightMapIntensity={props.maps === true ? 0.8 : 0}
@@ -185,7 +319,7 @@ export function Model(props) {
           position={[0.222136, 0.613031, -0.496007]}
         >
           <meshStandardMaterial
-            map={deskAlbedo}
+            map={robiniaBranson}
             aoMap={drawersAO}
             roughness={0.7}
             aoMapIntensity={props.maps === true ? 0.8 : 0}
@@ -508,9 +642,9 @@ export function Model(props) {
           map={chairAlbedo}
           aoMap={chairAO}
           aoMapIntensity={props.maps === true ? 0.7 : 0}
-          envMapIntensity={0.8}
+          envMapIntensity={0.5}
           lightMap={chairLM}
-          lightMapIntensity={props.maps === true ? 1.4 : 0}
+          lightMapIntensity={props.maps === true ? 1 : 0}
         />
       </mesh>
     </group>

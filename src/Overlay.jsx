@@ -3,7 +3,7 @@ import React from "react";
 function Overlay() {
   return (
     <div className="container">
-      <h1>LENS FLARE</h1>
+      <h1>Baking</h1>
     </div>
   );
 }
