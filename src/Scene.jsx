@@ -43,7 +43,7 @@ function Scene(props) {
         minDistance={0.4}
         maxDistance={3}
         minAzimuthAngle={-1}
-        maxAzimuthAngle={Math.PI / 4}
+        maxAzimuthAngle={Math.PI / 10}
       />
     </group>
   );

@@ -1,6 +1,5 @@
 import React, { useRef, useLayoutEffect, useEffect } from "react";
-import { useGLTF, useTexture, useKTX2 } from "@react-three/drei";
-import { useFrame, useThree } from "@react-three/fiber";
+import { useGLTF, useTexture, useKTX2, Text } from "@react-three/drei";
 import {
   SRGBColorSpace,
   LinearSRGBColorSpace,
@@ -8,12 +7,11 @@ import {
   Color,
 } from "three";
 import { gsap } from "gsap";
-import { useGesture } from "react-use-gesture";
 import * as THREE from "three";
 import { useAppStore } from "./store";
 
 export function Model(props) {
-  const { nodes, materials } = useGLTF("/bakingDemo-v1.glb");
+  const { nodes, materials } = useGLTF("/room.glb");
   const update = useAppStore((state) => state.update);
   const currentTexture = useAppStore((state) => state.currentTexture);
 
@@ -61,6 +59,7 @@ export function Model(props) {
     roomLM: "/baked/Room_LighMap2_PBR_Lightmap.ktx2",
     drawersLM: "/baked/Roundcube.001_LighMap2_PBR_Lightmap.ktx2",
     chairLM: "/baked/Tulip Chair Top_LighMap2_PBR_Lightmap.ktx2",
+    wallPanelLM: "/baked/Wall_panels_LighMap2_PBR_Lightmap.ktx2",
   };
   const albedos = {
     lampAlbedo: "/textures/Plane.012_metal_PBR_Diffuse.ktx2",
@@ -101,6 +100,7 @@ export function Model(props) {
     roomLM,
     drawersLM,
     chairLM,
+    wallPanelLM,
   ] = useKTX2([
     bakedTextures.plintAO,
     bakedTextures.ceilingAO,
@@ -120,6 +120,7 @@ export function Model(props) {
     bakedTextures.roomLM,
     bakedTextures.drawersLM,
     bakedTextures.chairLM,
+    bakedTextures.wallPanelLM,
   ]);
   const [robiniaBranson, oak1, oak2, walnut] = useTexture([
     deskWood.robiniaBranson,
@@ -152,6 +153,7 @@ export function Model(props) {
     roomLM,
     drawersLM,
     chairLM,
+    wallPanelLM,
   ]);
   fixAlbedo(lampAlbedo, 4);
   fixAlbedo(chairAlbedo, 4);
@@ -166,6 +168,7 @@ export function Model(props) {
   const drawersRef = useRef();
   const chairRef = useRef();
   const roomRef = useRef();
+  const wallPanelRef = useRef();
 
   useLayoutEffect(() => {
     plintRef.current.geometry.attributes.uv2 =
@@ -182,6 +185,8 @@ export function Model(props) {
       chairRef.current.geometry.attributes.uv;
     roomRef.current.geometry.attributes.uv2 =
       roomRef.current.geometry.attributes.uv;
+    wallPanelRef.current.geometry.attributes.uv2 =
+      wallPanelRef.current.geometry.attributes.uv;
   }, []);
 
   /**ANIMATE CUBES ON HOVER */
@@ -194,7 +199,7 @@ export function Model(props) {
     if (reference.current) {
       e.stopPropagation();
       const target = reference.current.position;
-      gsap.to(target, { y: 0.83, duration: 1 });
+      gsap.to(target, { y: 0.79, duration: 1 });
     }
   };
 
@@ -202,7 +207,7 @@ export function Model(props) {
     if (reference.current) {
       e.stopPropagation();
       const target = reference.current.position;
-      gsap.to(target, { y: 0.8, duration: 1 });
+      gsap.to(target, { y: 0.765, duration: 1 });
     }
   };
 
@@ -233,63 +238,74 @@ export function Model(props) {
   return (
     <group {...props} dispose={null} scale={1} position={[0, -0.2, 0]}>
       {/**CUBES ON DESK */}
+      <Text
+        position={[-0.24, 0.8, 0.1]}
+        fontSize={0.055}
+        font={"/Barlow-Light.ttf"}
+        color="#FFF"
+        anchorX="center"
+        anchorY="middle"
+        name="text"
+      >
+        CHANGE MATERIAL
+      </Text>
       <mesh
         ref={cube1}
         name="cube1"
-        position={[-0.42, 0.8, -0.1]}
+        position={[-0.42, 0.765, 0.2]}
         onPointerEnter={(e) => HoverUp(cube1, e)}
         onPointerLeave={(e) => ReturnPosition(cube1, e)}
         onClick={() => update({ currentTexture: "robiniaBranson" })}
       >
-        <boxGeometry args={[0.08, 0.08, 0.08]} />
+        <boxGeometry args={[0.09, 0.01, 0.09]} />
         <meshStandardMaterial
           map={robiniaBransonClone}
-          envMapIntensity={0.9}
+          envMapIntensity={0.6}
           roughness={0.7}
         />
       </mesh>
       <mesh
         ref={cube2}
         name="cube2"
-        position={[-0.31, 0.8, -0.1]}
+        position={[-0.31, 0.765, 0.2]}
         onPointerEnter={(e) => HoverUp(cube2, e)}
         onPointerLeave={(e) => ReturnPosition(cube2, e)}
         onClick={() => update({ currentTexture: "oak1" })}
       >
-        <boxGeometry args={[0.08, 0.08, 0.08]} />
+        <boxGeometry args={[0.09, 0.01, 0.09]} />
         <meshStandardMaterial
           map={oak1Clone}
-          envMapIntensity={0.9}
+          envMapIntensity={0.6}
           roughness={0.7}
         />
       </mesh>
       <mesh
         ref={cube3}
         name="cube3"
-        position={[-0.2, 0.8, -0.1]}
+        position={[-0.2, 0.765, 0.2]}
         onPointerEnter={(e) => HoverUp(cube3, e)}
         onPointerLeave={(e) => ReturnPosition(cube3, e)}
         onClick={() => update({ currentTexture: "oak2" })}
       >
-        <boxGeometry args={[0.08, 0.08, 0.08]} />
+        <boxGeometry args={[0.09, 0.01, 0.09]} />
         <meshStandardMaterial
           map={oak2Clone}
-          envMapIntensity={0.9}
+          envMapIntensity={0.6}
           roughness={0.7}
         />
       </mesh>
       <mesh
         name="cube4"
         ref={cube4}
-        position={[-0.09, 0.8, -0.1]}
+        position={[-0.09, 0.765, 0.2]}
         onPointerEnter={(e) => HoverUp(cube4, e)}
         onPointerLeave={(e) => ReturnPosition(cube4, e)}
         onClick={() => update({ currentTexture: "walnut" })}
       >
-        <boxGeometry args={[0.08, 0.08, 0.08]} />
+        <boxGeometry args={[0.09, 0.01, 0.09]} />
         <meshStandardMaterial
           map={walnutClone}
-          envMapIntensity={0.9}
+          envMapIntensity={0.6}
           roughness={0.7}
         />
       </mesh>
@@ -305,10 +321,10 @@ export function Model(props) {
           map={robiniaBranson}
           aoMap={deskAO}
           aoMapIntensity={props.maps === true ? 0.8 : 0}
-          envMapIntensity={0.8}
+          envMapIntensity={0.6}
           roughness={0.7}
           lightMap={deskLM}
-          lightMapIntensity={props.maps === true ? 0.8 : 0}
+          lightMapIntensity={props.maps === true ? 1.6 : 0}
         />
       </mesh>
       <group position={[-0.059966, 0, 0.050772]} rotation={[0, -1.570535, 0]}>
@@ -322,6 +338,7 @@ export function Model(props) {
             map={robiniaBranson}
             aoMap={drawersAO}
             roughness={0.7}
+            envMapIntensity={0.6}
             aoMapIntensity={props.maps === true ? 0.8 : 0}
             lightMap={drawersLM}
             lightMapIntensity={props.maps === true ? 1.4 : 0}
@@ -329,31 +346,35 @@ export function Model(props) {
         </mesh>
       </group>
       <group
-        position={[0.431448, 0.784661, 0.235016]}
-        rotation={[Math.PI / 2, 0, -0.129959]}
-        scale={[1, 1, 1.183377]}
-      >
-        <mesh
-          geometry={nodes.Plane003_1.geometry}
-          material={materials["Magazine Cover1.001"]}
-        />
-        <mesh
-          geometry={nodes.Plane003_2.geometry}
-          material={materials["Magazine Edge.001"]}
-        />
-      </group>
-      <group
         position={[0.421017, 0.768425, 0.236253]}
         rotation={[Math.PI / 2, 0, -0.233391]}
         scale={[0.937412, 0.937412, 1.945639]}
       >
         <mesh
-          geometry={nodes.Plane005_1.geometry}
+          geometry={nodes.Plane005.geometry}
           material={materials["Magazine Cover1.002"]}
+          material-envMapIntensity={1.8}
         />
         <mesh
-          geometry={nodes.Plane005_2.geometry}
+          geometry={nodes.Plane005_1.geometry}
           material={materials["Magazine Edge.001"]}
+          material-envMapIntensity={1.8}
+        />
+      </group>
+      <group
+        position={[0.431448, 0.784661, 0.235016]}
+        rotation={[Math.PI / 2, 0, -0.129959]}
+        scale={[1, 1, 1.183377]}
+      >
+        <mesh
+          geometry={nodes.Plane003.geometry}
+          material={materials["Magazine Cover1.001"]}
+          material-envMapIntensity={1.8}
+        />
+        <mesh
+          geometry={nodes.Plane003_1.geometry}
+          material={materials["Magazine Edge.001"]}
+          material-envMapIntensity={1.8}
         />
       </group>
       <mesh
@@ -397,7 +418,7 @@ export function Model(props) {
           aoMap={floorAO}
           lightMap={floorLM}
           aoMapIntensity={props.maps === true ? 0.9 : 0}
-          lightMapIntensity={props.maps === true ? 1.4 : 0}
+          lightMapIntensity={props.maps === true ? 1 : 0}
           envMapIntensity={0.8}
           roughness={0.8}
         />
@@ -483,90 +504,6 @@ export function Model(props) {
           material={materials.Picture1}
         />
       </group>
-      <mesh
-        geometry={nodes.Plane.geometry}
-        material={materials.crowning}
-        position={[-2.193169, 1.224893, -0.3293]}
-        rotation={[-Math.PI / 2, 0, 0]}
-        scale={[0.239658, 1, 0.64415]}
-      />
-      <mesh
-        geometry={nodes.Plane003.geometry}
-        material={materials.crowning}
-        position={[-1.465852, 1.224893, -0.3293]}
-        rotation={[-Math.PI / 2, 0, 0]}
-        scale={[0.239658, 1, 0.64415]}
-      />
-      <mesh
-        geometry={nodes.Plane006.geometry}
-        material={materials.crowning}
-        position={[1.264254, 1.224893, -0.3293]}
-        rotation={[-Math.PI / 2, 0, 0]}
-        scale={[0.239658, 1, 0.64415]}
-      />
-      <mesh
-        geometry={nodes.Plane009.geometry}
-        material={materials.crowning}
-        position={[2.012831, 1.224893, -0.3293]}
-        rotation={[-Math.PI / 2, 0, 0]}
-        scale={[0.239658, 1, 0.64415]}
-      />
-      <mesh
-        geometry={nodes.Plane002.geometry}
-        material={materials.crowning}
-        position={[-2.193169, 2.052421, -0.333092]}
-        rotation={[-Math.PI / 2, 0, 0]}
-        scale={[0.239658, 1, 0.107914]}
-      />
-      <mesh
-        geometry={nodes.Plane001.geometry}
-        material={materials.crowning}
-        position={[-2.193169, 0.369506, -0.333092]}
-        rotation={[-Math.PI / 2, 0, 0]}
-        scale={[0.239658, 1, 0.107914]}
-      />
-      <mesh
-        geometry={nodes.Plane004.geometry}
-        material={materials.crowning}
-        position={[-1.465852, 2.052421, -0.333092]}
-        rotation={[-Math.PI / 2, 0, 0]}
-        scale={[0.239658, 1, 0.107914]}
-      />
-      <mesh
-        geometry={nodes.Plane005.geometry}
-        material={materials.crowning}
-        position={[-1.465852, 0.369506, -0.333092]}
-        rotation={[-Math.PI / 2, 0, 0]}
-        scale={[0.239658, 1, 0.107914]}
-      />
-      <mesh
-        geometry={nodes.Plane007.geometry}
-        material={materials.crowning}
-        position={[1.264254, 2.052421, -0.333092]}
-        rotation={[-Math.PI / 2, 0, 0]}
-        scale={[0.239658, 1, 0.107914]}
-      />
-      <mesh
-        geometry={nodes.Plane008.geometry}
-        material={materials.crowning}
-        position={[1.264254, 0.369506, -0.333092]}
-        rotation={[-Math.PI / 2, 0, 0]}
-        scale={[0.239658, 1, 0.107914]}
-      />
-      <mesh
-        geometry={nodes.Plane010.geometry}
-        material={materials.crowning}
-        position={[2.012831, 2.052421, -0.333092]}
-        rotation={[-Math.PI / 2, 0, 0]}
-        scale={[0.239658, 1, 0.107914]}
-      />
-      <mesh
-        geometry={nodes.Plane011.geometry}
-        material={materials.crowning}
-        position={[2.012831, 0.369506, -0.333092]}
-        rotation={[-Math.PI / 2, 0, 0]}
-        scale={[0.239658, 1, 0.107914]}
-      />
       <group position={[-0.580647, 0.756357, 0.01742]} scale={0.56}>
         <mesh
           geometry={nodes.Ottolo_Lamp_replica_1.geometry}
@@ -647,6 +584,23 @@ export function Model(props) {
           lightMapIntensity={props.maps === true ? 1 : 0}
         />
       </mesh>
+      <mesh
+        ref={wallPanelRef}
+        geometry={nodes.Wall_panels.geometry}
+        position={[1.547604, 1.102373, -0.300963]}
+      >
+        <meshStandardMaterial
+          lightMap={wallPanelLM}
+          color={"#F2F2F2"}
+          envMapIntensity={0.5}
+        />
+      </mesh>
+      <mesh
+        geometry={nodes.Wall_panels004.geometry}
+        material={materials.Baseboard_material}
+        material-envMapIntensity={0.5}
+        position={[-1.939024, 1.102373, -0.300962]}
+      />
     </group>
   );
 }
