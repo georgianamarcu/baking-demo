@@ -13,7 +13,8 @@ body,
 }
 
 body {
-  background: #ffffff75;
+  background: #000;
+
   /* fallback for old browsers */
 
 }
@@ -113,4 +114,46 @@ h1 {
 .button--surtur,
 .textcircle {
   animation: rotateIt 7s linear infinite;
+}
+
+
+.loadingScreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background-color: "#000";
+  color: #FFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 4s;
+  z-index: 1;
+  font-family: 'Barlow', sans-serif;
+}
+
+.loadingScreen--started {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 1em;
+}
+
+.loadingScreen__progress__value {
+  height: 0.1em;
+  background-color: rgba(255, 255, 255, 0.5);
+  transition: width 0.4s;
+}
+
+.loading-text {
+  align-self: flex-end;
+  font-family: 'Barlow',
+    sans-serif;
+  ;
 }

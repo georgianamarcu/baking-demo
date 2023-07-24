@@ -1,15 +1,14 @@
 import "./App.css";
 import { Canvas } from "@react-three/fiber";
 import Scene from "./Scene";
-import { Loader, OrbitControls, PerspectiveCamera } from "@react-three/drei";
-import Overlay from "./Overlay";
 import AnimatedCursor from "react-animated-cursor";
-import { useRef } from "react";
+import { Suspense, useRef } from "react";
 import { useAppStore } from "./store";
+import Loader from "./Loader";
 
 function App() {
-  const camera = useRef();
   const color = useAppStore((state) => state.color);
+  const started = useAppStore((state) => state.started);
   return (
     <>
       <Canvas
@@ -27,7 +26,9 @@ function App() {
           ],
         }}
       >
-        <Scene position={[0.17, 0.56, 0.92]} />
+        <Suspense fallback={null}>
+          {started && <Scene position={[0.17, 0.56, 0.92]} />}
+        </Suspense>
       </Canvas>
       <AnimatedCursor
         innerSize={10}
@@ -37,8 +38,8 @@ function App() {
         innerScale={0.7}
         outerScale={2}
       />
-      <Loader />
       {/* <Overlay /> */}
+      <Loader />
     </>
   );
 }

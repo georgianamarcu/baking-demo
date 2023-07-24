@@ -3,6 +3,7 @@ import { create } from "zustand";
 const initialState = {
   color: "255, 255, 255",
   currentTexture: "robiniaBranson",
+  started: false,
 };
 
 export const useAppStore = create((set) => ({
